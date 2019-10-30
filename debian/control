@@ -1,0 +1,54 @@
+Source: libbml
+Priority: optional
+Section: libs
+Maintainer: Johann Baudy <johann.baudy@seagnal.fr>
+Uploaders: Johann Baudy <johann.baudy@seagnal.fr>
+Standards-Version: 3.9.0.0
+Build-Depends: debhelper (>= 7.0.50~), python3-all-dev (>= 2.3.5-11), python3-all-dbg, python3-support (>= 0.3), autotools-dev
+Homepage: http://bml.gnu-log.net/
+Vcs-Git: git://git.debian.org/debian-xml-sgml/libxml2.git
+Vcs-Browser: http://git.debian.org/?p=debian-xml-sgml/libxml2.git
+
+Package: libbml
+Priority: standard
+Architecture: any
+Section: libs
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Recommends: xml-core
+Description: Binary Markup Language library
+ BML is a metalanguage to let you design your own markup language.
+ A regular markup language defines a way to describe information in
+ a certain class of documents (eg HTML). BML lets you define your
+ own customized markup languages for many classes of document.
+ . 
+ This package provides a library providing an extensive API to handle
+ such BML data files.
+
+Package: libbml-dev
+Architecture: any
+Section: libdevel
+Depends: libbml (= ${binary:Version}), ${misc:Depends}
+Description: Development files for the BML library
+ BML is a metalanguage to let you design your own markup language.
+ A regular markup language defines a way to describe information in
+ a certain class of documents (eg HTML). BML lets you define your
+ own customized markup languages for many classes of document. 
+ .
+ Install this package if you wish to develop your own programs using
+ the BML library.
+
+Package: python-libbml
+Architecture: any
+Section: python
+Provides: ${python:Provides}
+Depends: ${shlibs:Depends}, ${misc:Depends}, ${python:Depends}
+XB-Python-Version: ${python:Versions}
+Description: Python bindings for the BML library
+ BML is a metalanguage to let you design your own markup language.
+ A regular markup language defines a way to describe information in
+ a certain class of documents (eg HTML). BML lets you define your
+ own customized markup languages for many classes of document. 
+ .
+ This package contains the files needed to use the GNOME XML library
+ in Python programs.
+
