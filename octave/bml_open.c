@@ -780,7 +780,7 @@ void mexFunction(int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[]) {
 	}
 
 	/* Create FILE pointer */
-#ifdef __x86_64__
+#if defined(__x86_64__) || defined(__aarch64__) 
 	v = mxCreateNumericMatrix(1, 1, mxUINT64_CLASS, mxREAL);
 #else
 	v = mxCreateNumericMatrix(1, 1, mxUINT32_CLASS, mxREAL);
