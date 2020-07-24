@@ -4,8 +4,12 @@
 #include <stdio.h>
 #include <errno.h>
 #include <string.h>
-#include <netdb.h>
+//#include <netdb.h>
 #include <unistd.h>
+
+#ifdef WIN32
+#include <winsock2.h>
+#endif
 
 //#define DEBUG
 //#define DEBUG_IO
@@ -285,7 +289,11 @@ int cb_io_socket_read(struct bml_parser * in_ps_ctx, void *in_pv_user_arg,
 
 		if (ac_tmp_index == ac_tmp_acc) {
 
+#ifndef WIN32
 			ac_tmp_acc = recv(ps_handle->i_socket, &ac_tmp[0], LF_SIZE_BUFFER, MSG_DONTWAIT);
+#else
+            ac_tmp_acc = recv(ps_handle->i_socket, &ac_tmp[0], LF_SIZE_BUFFER, 0);
+#endif
 			if((ac_tmp_acc < 0) && ((errno == EAGAIN) || (errno == EWOULDBLOCK)) ) {
 #ifdef DEBUG_IO
 				printf("read WAIT %d\n", ac_tmp_acc);
@@ -469,7 +477,7 @@ void mexFunction(int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[]) {
 	if ((pc_mode[0] == 'r') || (pc_mode[0] == 'p')) {
 
 		/* Opening FILE */
-		ps_handle->fd = fopen(pc_file, "r");
+		ps_handle->fd = fopen(pc_file, "rb");
 
 
 
@@ -521,7 +529,7 @@ void mexFunction(int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[]) {
 		ps_handle->i_align = i_align;
 
 		/* Opening FILE */
-		ps_handle->fd = fopen(pc_file, "a");
+		ps_handle->fd = fopen(pc_file, "ab");
 		if (ps_handle->fd == NULL) {
 			mexPrintf("unable to open file %s: %s\n", pc_file, strerror(errno));
 			mexErrMsgTxt("unable to open file");
@@ -547,7 +555,7 @@ void mexFunction(int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[]) {
 		ps_handle->i_align = i_align;
 
 		/* Opening FILE */
-		ps_handle->fd = fopen(pc_file, "w");
+		ps_handle->fd = fopen(pc_file, "wb");
 		if (ps_handle->fd == NULL) {
 			mexPrintf("unable to open file %s: %s\n", pc_file, strerror(errno));
 			mexErrMsgTxt("unable to open file");
@@ -628,7 +636,8 @@ void mexFunction(int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[]) {
 
 			he = (struct hostent *) gethostbyname(ac_ip);
 			if (he == NULL) {  // get the host info
-				herror("gethostbyname");
+				//herror("gethostbyname");
+                fprintf(stderr, "gethostbyname");
 				mexErrMsgTxt("Error in gethostbyname");
 				ec = EC_FAILURE;
 				goto out_err;
@@ -670,7 +679,7 @@ void mexFunction(int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[]) {
 
 
 
-			if (setsockopt(socket_fd, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof(int)) == -1) {
+			if (setsockopt(socket_fd, SOL_SOCKET, SO_REUSEADDR, (const void *)&yes, sizeof(int)) == -1) {
 				mexErrMsgTxt("setsockopt\n");
 				ec = EC_FAILURE;
 				goto out_err;
@@ -695,7 +704,11 @@ void mexFunction(int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[]) {
 				}
 
 				{
+#ifndef WIN32
 					socklen_t size = sizeof(struct sockaddr_in);
+#else
+                    int size = sizeof(struct sockaddr_in);
+#endif
 					int client_fd;
 					if ((client_fd = accept(socket_fd, (struct sockaddr *)&dest, &size))==-1) {
 						//fprintf(stderr,"Accept Failure\n");
