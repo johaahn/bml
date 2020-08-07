@@ -5,10 +5,11 @@
 #include <errno.h>
 #include <string.h>
 //#include <netdb.h>
-#include <unistd.h>
 
-#ifdef WIN32
-#include <winsock2.h>
+#ifndef WIN32
+    #include <unistd.h>
+#else
+    #include <winsock2.h>
 #endif
 
 //#define DEBUG
@@ -716,7 +717,11 @@ void mexFunction(int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[]) {
 						exit(1);
 					}
 					/* Close parent socket */
+#ifndef WIN32
 					close(socket_fd);
+#else
+                    closesocket(socket_fd);
+#endif
 					/* Keep client socket */
 					socket_fd = client_fd;
 				}
@@ -807,7 +812,11 @@ void mexFunction(int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[]) {
 			fclose(ps_handle->fd);
 		}
 		if (ps_handle->i_socket != -1) {
-			close(ps_handle->i_socket);
+#ifndef WIN32
+            close(ps_handle->i_socket);
+#else
+            closesocket(ps_handle->i_socket);
+#endif			
 		}
 	}
 
