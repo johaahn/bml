@@ -4,7 +4,12 @@
 #include <stdio.h>
 #include <errno.h>
 #include <string.h>
-#include <unistd.h>
+
+//#ifndef WIN32
+//#include <unistd.h>
+//#else
+//#include <winsock2.h>
+//#endif
 
 #include <bml.h>
 #include "bml_handle.h"
