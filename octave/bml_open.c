@@ -798,7 +798,7 @@ void mexFunction(int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[]) {
 	}
 
 	/* Create FILE pointer */
-#if defined(__x86_64__) || defined(__aarch64__) 
+#if defined(__x86_64__) || defined(__aarch64__) || defined(_WIN64)
 	v = mxCreateNumericMatrix(1, 1, mxUINT64_CLASS, mxREAL);
 #else
 	v = mxCreateNumericMatrix(1, 1, mxUINT32_CLASS, mxREAL);

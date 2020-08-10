@@ -3,12 +3,16 @@
 %% TEST
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 addpath('./../');
-filename=[getenv("HOME") "/bml_test.dat"];
+if ~ispc % not windows	
+    filename=[getenv("HOME") + '/bml_test.dat'];
+else % windows
+    filename= 'bml_test.dat';
+end
 
 ID=24;
 SUB_ID=16;
 
-printf('TEST WRITE: %s\n',filename);
+fprintf('TEST WRITE: %s\n',filename);
 
 % Opening file in order to write data into
 fid = bml_open(filename, 'w');
@@ -35,7 +39,7 @@ bml_write(fid, struct('id', 10, 'data', "data parent" , "childs", [a, b]));
 bml_close(fid);
 
 
-printf('TEST READ\n');
+fprintf('TEST READ\n');
 
 % Opening file in order to read data from
 fid = bml_open(filename, 'r');
