@@ -48,5 +48,5 @@ else
 	mex  -v ./bml_write.c ../sab_parser/bml.c -I../sab_parser  -lws2_32 COMPFLAGS="$COMPFLAGS -DWIN32 /W4" 
 end
 
- disp("Compilation OK\n");
+ disp("Compilation terminated.\n");
 
