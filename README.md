@@ -59,28 +59,28 @@ The Matlab mex compiler can compile C/C++ code using the Visual Studio and MinGW
 	
 To check which compiler is selected open Matlab and use the command:
 
-``mex -setup``
+``>> mex -setup``
 	
 To manually select the compilers type the following command line:
 
 For Visual Studio 2017 compiler: 
 
-``mex -setup:'<path to the MATLAB dir>\R2020a\bin\win64\mexopts\msvc2017.xml' ``
+``>> mex -setup:'<path to the MATLAB dir>\R2020a\bin\win64\mexopts\msvc2017.xml' ``
 
 For MinGW compiler:
 
-``mex -setup:'<path to the MATLAB dir>\R2020a\bin\win64\mexopts\mingw64.xml'``
+``>> mex -setup:'<path to the MATLAB dir>\R2020a\bin\win64\mexopts\mingw64.xml'``
 
 
 ### Run the sample test
 
 * Go to the directory <*bml root dir*>/*octave*/*test*
 	
-	``cd test``
+	``>> cd test``
 
 * Run the script test_bml.m 
 	
-	``test_bml``
+	``>> test_bml``
 
 
 
