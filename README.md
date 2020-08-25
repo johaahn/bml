@@ -9,15 +9,24 @@ For more details: http://www.gnu-log.net/home/bml
 
 
 The bml library can be compiled and used in other languages. 
-The binding for Matlab, Octave and Python are provided.
+The language binding for Matlab, Octave and Python are provided.
 
 
-## Matlab
+## Matlab (Windows)
+
+### Overview
+
+The Matlab binding of the bml library creates mex functions to manipulate the bml files that can be called from Matlab.
 
 The following instructions describes how to compile and use the bml library in Matlab.
 
-The bml Matlab binding creates mex functions that can be called from Matlab.
 
+### Prerequisites
+
+A Visual Studio or MinGW C/C++ compiler installation is required for generating the bml Matlab mex functions. 
+
+
+### Getting the required Source Code  and Build
 
 1. Checkout bml library from Github:
 	
@@ -35,7 +44,17 @@ The bml Matlab binding creates mex functions that can be called from Matlab.
 		
 		``compile_matlab``
 
-Matlab can compile C/C++ code using the Visual Studio and MinGW C++ compilers. 
+If the mex compiling process completed successfully the following mex functions are generated in the octave directory:
+
+*	*bml_open.mexw64*
+*	*bml_read.mexw64*
+*	*bml_write.mexw64*
+*	*bml_close.mexw64*
+
+
+### Matlab Mex Compiler Configuration
+
+The Matlab mex compiler can compile C/C++ code using the Visual Studio and MinGW C++ compilers. 
 	
 To check which compiler is selected use the command:
 
@@ -52,15 +71,7 @@ For MinGW compiler:
 ``mex -setup:'<path to the MATLAB dir>\R2020a\bin\win64\mexopts\mingw64.xml'``
 
 
-If the mex compiling process completed successfully the following mex functions are generated in the octave directory:
-
-*	*bml_open.mexw64*
-*	*bml_read.mexw64*
-*	*bml_write.mexw64*
-*	*bml_close.mexw64*
-
-
-#### Run the sample test
+### Run the sample test
 
 * Go to the directory <*bml root dir*>/*octave*/*test*
 	
@@ -73,12 +84,17 @@ If the mex compiling process completed successfully the following mex functions 
 
 
 	
-## Octave
+## Octave (Linux, Windows)
 
-The following instructions describes how to compile and use the bml library in Octave.
 
-The bml Octave binding creates mex functions that can be called from Octave.
+### Overview
 
+The Octave binding of the bml library creates mex functions to manipulate the bml files that can be called from Octave.
+
+The following instructions describes how to compile and use the bml library in Octave. 
+
+
+### Getting the required Source Code  and Build
 
 1. Checkout bml library from Github:
 	
@@ -86,17 +102,21 @@ The bml Octave binding creates mex functions that can be called from Octave.
 
 2. Build bml:
 
-	* Open ocatve at the bml root directory
+	* Open a terminal at the bml root directory
 
 	* Move to the directory <*bml root dir*>/*octave* 
 		
 		``cd octave``
 
-	* Run the script *compile.m* 
+	* Run the command line to execute the Octave script *compile.m* 
+	
+		Linux:
+		``octave-cli --eval compile`` 
 		
-		``compile``
+		Windows 
+		``octave-cli.exe --eval compile``
 
-If the mex compiling completed successfully the following mex functions are generated in the octave directory:
+If the Octave mex compiling completed successfully the following mex functions are generated in the octave directory:
 
 *	*bml_open.mex*
 *	*bml_read.mex*
@@ -104,7 +124,7 @@ If the mex compiling completed successfully the following mex functions are gene
 *	*bml_close.mex*
 
 
-#### Run the sample test
+### Run the sample test
 
 * Go to the directory <bml root dir>/octave/test
 	
