@@ -41,7 +41,7 @@ A Visual Studio or MinGW C/C++ compiler installation is required for generating 
 		
 		``cd octave``
 
-	* Run the script *compile_matlab.m *
+	* Run the script *compile_matlab.m*
 		
 		``compile_matlab``
 
