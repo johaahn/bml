@@ -57,7 +57,7 @@ If the mex compiling process completed successfully the following mex functions 
 
 The Matlab mex compiler can compile C/C++ code using the Visual Studio and MinGW C++ compilers. 
 	
-To check which compiler is selected use the command:
+To check which compiler is selected open Matlab and use the command:
 
 ``mex -setup``
 	
@@ -127,21 +127,21 @@ If the Octave mex compiling completed successfully the following mex functions a
 
 ### Run the sample test
 
-* Go to the directory <bml root dir>/octave/test
+* Open from a terminal shell and go to the directory <*bml root dir*>/*octave* 
 	
 	``cd test``
 
-* Open Octave or Octave command line
+* Open Octave or Octave command line 
 
 	Linux:
-		``octave-cli`` 
+	``octave-cli`` 
 		
-		Windows 
-		``octave-cli.exe``
+	Windows 
+	``octave-cli.exe``
 
 * Run the script *test_bml.m* 
 	
-	``test_bml``
+	``>> test_bml``
 
 
 
@@ -152,3 +152,4 @@ If the Octave mex compiling completed successfully the following mex functions a
 	* ``git clone https://github.com/johaahn/bml.git``
 	
 	* TO DO
+	
