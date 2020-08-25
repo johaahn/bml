@@ -9,6 +9,7 @@ For more details: http://www.gnu-log.net/home/bml
 
 
 The bml library can be compiled and used in other languages. 
+
 The language binding for Matlab, Octave and Python are provided.
 
 
@@ -52,7 +53,7 @@ If the mex compiling process completed successfully the following mex functions 
 *	*bml_close.mexw64*
 
 
-### Matlab Mex Compiler Configuration
+### Matlab Mex Compiler Configuration (Optional)
 
 The Matlab mex compiler can compile C/C++ code using the Visual Studio and MinGW C++ compilers. 
 	
@@ -102,7 +103,7 @@ The following instructions describes how to compile and use the bml library in O
 
 2. Build bml:
 
-	* Open a terminal at the bml root directory
+	* Open a terminalshell at the bml root directory
 
 	* Move to the directory <*bml root dir*>/*octave* 
 		
