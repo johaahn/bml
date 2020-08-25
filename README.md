@@ -103,7 +103,7 @@ The following instructions describes how to compile and use the bml library in O
 
 2. Build bml:
 
-	* Open a terminalshell at the bml root directory
+	* Open a terminal shell at the bml root directory
 
 	* Move to the directory <*bml root dir*>/*octave* 
 		
@@ -130,6 +130,14 @@ If the Octave mex compiling completed successfully the following mex functions a
 * Go to the directory <bml root dir>/octave/test
 	
 	``cd test``
+
+* Open Octave or Octave command line
+
+	Linux:
+		``octave-cli`` 
+		
+		Windows 
+		``octave-cli.exe``
 
 * Run the script *test_bml.m* 
 	
