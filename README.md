@@ -39,11 +39,11 @@ A Visual Studio or MinGW C/C++ compiler installation is required for generating 
 
 	* Move to the directory <*bml root dir*>/*octave* 
 		
-		``cd octave``
+		``>> cd octave``
 
 	* Run the script *compile_matlab.m*
 		
-		``compile_matlab``
+		``>> compile_matlab``
 
 If the mex compiling process completed successfully the following mex functions are generated in the octave directory:
 
