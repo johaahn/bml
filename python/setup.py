@@ -1,4 +1,15 @@
 from distutils.core import setup, Extension
+import lsb_release
+
+print(lsb_release.get_distro_information())
+
+if lsb_release.get_distro_information()['CODENAME'] == 'focal':
+    python_lib = 'boost_python-py38'
+elif lsb_release.get_distro_information()['CODENAME'] == 'xenial':
+    python_lib = 'boost_python-py35'
+else:
+    python_lib = 'boost_python-py34'
+
 
 module1 = Extension('bml',
                     define_macros = [('MAJOR_VERSION', '1'),
