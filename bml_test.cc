@@ -35,6 +35,133 @@ START_TEST(test_external_segment) {
 } END_TEST
 
 
+START_TEST(test_container) {
+    std::cout << "test_container START" << std::endl;
+    {
+        node<uint32_t, std::shared_ptr> c_node(1234);
+        //std::basic_string<char> str_tmp("qwertyuiop");
+        std::list<uint32_t> l_tmp;
+        l_tmp.push_back(0);
+        l_tmp.push_back(1);
+        c_node.set_data(l_tmp);
+        ck_assert(c_node.get_size() == sizeof(uint32_t)*2);
+        std::list<uint32_t> l_tmp_res;
+
+        l_tmp_res = c_node.get_data<std::list<uint32_t>>();
+        ck_assert(l_tmp_res == l_tmp);
+    }
+    //std::cout << c_node.get_size() << std::endl;
+
+    {
+        node<uint32_t, std::shared_ptr> c_node(1234);
+        std::string str_test("abc");
+        c_node.set_data(str_test);
+        ck_assert(c_node.get_size() == 3);
+        std::string str_tmp_res;
+        str_tmp_res = c_node.get_data<std::string>();
+        ck_assert(str_tmp_res == str_test);
+    }
+
+    {
+        node<uint32_t, std::shared_ptr> c_node(1234);
+        std::vector<float> vf_test = {1,2,3,4,5};
+        c_node.set_data(vf_test);
+        ck_assert(c_node.get_size() == 5*sizeof(float));
+        std::vector<float> vf_res = c_node.get_data<std::vector<float>>();
+        ck_assert(vf_test == vf_res);
+    }
+
+    {
+        node<uint32_t, std::shared_ptr> c_node(1234);
+        struct s_struct_t {
+            uint32_t i_data;
+            uint64_t i_dummy;
+        } s_struct, s_struct2;
+        s_struct.i_data = 10;
+        s_struct.i_dummy = 11;
+        c_node.set_data(s_struct);
+        ck_assert(c_node.get_size() == sizeof(s_struct));
+        s_struct2 = c_node.get_data<s_struct_t>();
+        ck_assert(s_struct2.i_data == s_struct.i_data);
+        ck_assert(s_struct2.i_dummy == s_struct.i_dummy);
+    }
+
+    {
+        node<uint32_t, std::shared_ptr> c_node(1234);
+        struct s_struct_t{
+            uint32_t i_data;
+            uint64_t i_dummy;
+
+            bool operator == (const s_struct_t &rhs) const
+            {
+                if(i_data != rhs.i_data) return false;
+                if(i_dummy != rhs.i_dummy) return false;
+                return true;
+            }
+
+        } s_struct;
+        std::vector<s_struct_t> vs_tmp(10);
+        uint32_t i_cnt = 0;
+        for(auto & s_item : vs_tmp) {
+            s_item.i_data = i_cnt++;
+            s_item.i_dummy = i_cnt++;
+        }
+        c_node.set_data(vs_tmp);
+        ck_assert(c_node.get_size() == 10*sizeof(s_struct));
+        std::vector<s_struct_t> vs_tmp_res;
+        vs_tmp_res = c_node.get_data<std::vector<s_struct_t>>();
+        ck_assert(vs_tmp_res == vs_tmp);
+        ck_assert(vs_tmp_res.size() == vs_tmp.size());
+    }
+
+    /* Should not compile. Its ok.
+  {
+  {
+    node<uint32_t, std::shared_ptr> c_node(1234);
+    std::vector<bool> vf_toto = {1,0,1,0,1};
+    c_node.set_data(vf_toto);
+    ck_assert(c_node.get_size() == 5*sizeof(bool));
+  }
+  }
+  */
+
+/* Should not compile. Its ok. */
+#if 0
+          {
+            node<uint32_t, std::shared_ptr> c_node(1234);
+            //std::basic_string<char> str_tmp("qwertyuiop");
+                std::list<std::string> l_tmp;
+            l_tmp.push_back(std::string("ddd"));
+            l_tmp.push_back(std::string("xxxx"));
+            c_node.set_data(l_tmp);
+            ck_assert(c_node.get_size() == sizeof(uint32_t)*2);
+          }
+#endif
+
+
+    /*
+  MAP not supported
+  {
+    node<uint32_t, std::shared_ptr> c_node(1234);
+    std::map<uint32_t, uint64_t> mi_data;
+    mi_data[0] = 1;
+    mi_data[56] = 2;
+    mi_data[567] = 3;
+    c_node.set_data(mi_data);
+    ck_assert(c_node.get_size() == 3*sizeof(uint64_t));
+  }
+  */
+
+    {
+        node<uint32_t, std::shared_ptr> c_node(1234);
+        c_node.set_data(double(5));
+        ck_assert(c_node.get_size() == sizeof(double));
+    }
+
+    std::cout << "test_container END" << std::endl;
+} END_TEST
+
+
 START_TEST(test_find_childs) {
 
 } END_TEST
@@ -326,6 +453,7 @@ Suite * money_suite(void)
   tcase_add_test(tc_core, test_set_get_data);
   tcase_add_test(tc_core, test_memcpy);
   tcase_add_test(tc_core, test_doc);
+  tcase_add_test(tc_core, test_container);
   suite_add_tcase(s, tc_core);
 
   return s;

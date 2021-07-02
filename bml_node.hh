@@ -1024,6 +1024,40 @@ public:
 };
 
 /*!
+* Is container identification class.
+*/
+
+template<typename ...>
+using to_void = void; // maps everything to void, used in non-evaluated contexts
+
+template<typename T, typename = void>
+struct is_container : std::false_type
+{};
+template<typename T>
+struct is_container<T,
+                    to_void<decltype(std::declval<T>().begin()),
+                            decltype(std::declval<T>().end()),
+                            typename T::value_type
+                            >> : std::true_type // will  be enabled for iterable objects
+{};
+template<typename T, typename = void>
+struct is_map : std::false_type
+{};
+template<typename T>
+struct is_map<T,
+              to_void<typename T::key_type
+                      >> : std::true_type // will  be enabled for iterable objects
+{};
+template<typename T, typename = void>
+struct is_contiguous : std::false_type
+{};
+template<typename T>
+struct is_contiguous<T,
+                     to_void<decltype(std::declval<T>().data())
+                             >> : std::true_type // will  be enabled for iterable objects
+{};
+
+/*!
 * BML Node class.
 * Class used to manipulate BML nodes:
 *  - Add/Remove Childs
@@ -1336,6 +1370,10 @@ public:
 	 */
 	template<typename T2> T2 get_data(void) const;
 
+    template<typename T2, typename std::enable_if<is_container<T2>::value && !is_map<T2>::value && !is_contiguous<T2>::value >::type* = nullptr> T2 get_data(void) const;
+    template<typename T2, typename std::enable_if<is_container<T2>::value && !is_map<T2>::value && is_contiguous<T2>::value >::type* = nullptr> T2 get_data(void) const;
+    template<typename T2, typename std::enable_if<!is_container<T2>::value >::type* = nullptr> T2 get_data(void) const;
+
 	/*!
 	 * Set data content.
 	 *
@@ -1345,8 +1383,11 @@ public:
 	 *
 	 * Old data is cleared.
 	 * @param in source of data
-	 */
-	template<typename T2> void set_data(T2 const & in);
+     */
+    template<typename T2, typename std::enable_if<is_container<T2>::value && !is_map<T2>::value && !is_contiguous<T2>::value >::type* = nullptr> void set_data(T2 const & in);
+    template<typename T2, typename std::enable_if<is_container<T2>::value && !is_map<T2>::value && is_contiguous<T2>::value >::type* = nullptr> void set_data(T2 const & in);
+    template<typename T2, typename std::enable_if<!is_container<T2>::value >::type* = nullptr> void set_data(T2 const & in);
+
 
 	/*!
 	 * Set data from node resource segment.
@@ -1631,12 +1672,12 @@ typename node<T,G>::er_it node<T,G>::equal_range(T const & in_id) {
     return _m_childs.equal_range(in_id);
 }
 
-/*
+
 template<typename T, template<class > class G>
-typename std::pair<node<T,G>::const_it,node<T,G>::const_it> equal_range(T const & in_i_id) const {
+typename node<T,G>::const_er_it node<T,G>::equal_range(T const & in_id) const {
   return _m_childs.equal_range(in_id);
 }
-*/
+
 
 template<typename T, template<class > class G>
 typename node<T, G>::find_result node<T, G>::find(T const & in_id) {
@@ -1764,18 +1805,89 @@ node<T, G> & node<T, G>::operator()(T const & in_id, uint64_t in_i_indice) {
 }
 
 /* common assignment */
-template<typename T, template<class > class G> template<typename T2>
+template<typename T, template<class > class G>
+template<typename T2, typename std::enable_if<!is_container<T2>::value >::type*>
 void node<T, G>::set_data(T2 const & in) {
-	resize(sizeof(T2));
-	_s_segment.template set_data<T2>(in);
-	VALGRIND_CHECK_VALUE_IS_DEFINED(in);
+    //static_assert(std::is_integral<T2>::value || std::is_floating_point<T2>::value || std::is_pointer<T2>::value, "Either integral, float or pointer required.");
+    resize(sizeof(T2));
+    _s_segment.template set_data<T2>(in);
+    VALGRIND_CHECK_VALUE_IS_DEFINED(in);
+    //std::cout << "SET COPY" << std::endl;
 }
 
-/* explicit funtion cast  */
-template<typename T, template<class > class G> template<typename T2>
-T2 node<T, G>::get_data(void) const {
-	return _s_segment.template get_data<T2>();;
+template<typename T, template<class > class G>
+template<typename T2, typename std::enable_if<is_container<T2>::value && !is_map<T2>::value && !is_contiguous<T2>::value >::type*>
+void node<T, G>::set_data(T2 const & in) {
+    typedef typename T2::value_type T2S;
+    static_assert(!is_container<T2S>::value, "Value type must not be a container.");
+    uint32_t i_cnt = 0;
+    size_t i_size = in.size();
+    resize(sizeof(T2S)*i_size);
+    T2S* pc_tmp = mmap<T2S>();
+    for (auto pc_it = in.cbegin(); pc_it != in.cend(); pc_it++) {
+        *pc_tmp++ = *pc_it;
+        i_cnt++;
+        VALGRIND_CHECK_VALUE_IS_DEFINED(*pc_it);
+    }
+    //std::cout << "SET DATA NONCONTIGUOUS" << std::endl;
+    assert(i_cnt == i_size);
 }
+
+
+template<typename T, template<class > class G>
+template<typename T2, typename std::enable_if<is_container<T2>::value && !is_map<T2>::value && is_contiguous<T2>::value >::type*>
+void node<T, G>::set_data(T2 const & in) {
+    typedef typename T2::value_type T2S;
+    //static_assert(std::is_integral<T2S>::value || std::is_floating_point<T2S>::value || std::is_pointer<T2S>::value, "Either integral, float or pointer required.");
+    static_assert(!is_container<T2S>::value, "Value type must not be a container.");
+    size_t i_size = in.size();
+    resize(sizeof(T2S)*i_size);
+    memcpy_from_buffer((const char*)in.data(), in.size()*sizeof(T2S));
+    VALGRIND_CHECK_MEM_IS_DEFINED(in.data(), in.size()*sizeof(T2S));
+    //std::cout << "SET DATA CONTIGUOUS" << std::endl;
+}
+
+/* common assignment */
+template<typename T, template<class > class G>
+template<typename T2, typename std::enable_if<!is_container<T2>::value >::type*>
+T2 node<T, G>::get_data(void) const {
+    //static_assert(std::is_integral<T2>::value || std::is_floating_point<T2>::value || std::is_pointer<T2>::value, "Either integral, float or pointer required.");
+    return _s_segment.template get_data<T2>();
+    VALGRIND_CHECK_VALUE_IS_DEFINED(in);
+    //std::cout << "SET COPY" << std::endl;
+}
+
+
+template<typename T, template<class > class G>
+template<typename T2, typename std::enable_if<is_container<T2>::value && !is_map<T2>::value && !is_contiguous<T2>::value >::type*>
+T2 node<T, G>::get_data(void) const {
+    typedef typename T2::value_type T2S;
+    T2 c_tmp;
+    assert(get_size() >= sizeof(T2S));
+    assert(get_size()%sizeof(T2S) == 0);
+    auto i_size = (get_size()/sizeof(T2S));
+    T2S* pc_tmp = mmap<T2S>();
+    for (auto i_cnt = 0U; i_cnt != i_size; i_cnt++)
+    {
+        c_tmp.push_back(*pc_tmp++);
+    }
+    return c_tmp;
+}
+
+template<typename T, template<class > class G>
+template<typename T2, typename std::enable_if<is_container<T2>::value && !is_map<T2>::value && is_contiguous<T2>::value >::type*>
+T2 node<T, G>::get_data(void) const {
+    typedef typename T2::value_type T2S;
+    //static_assert(std::is_integral<T2S>::value || std::is_floating_point<T2S>::value || std::is_pointer<T2S>::value, "Either integral, float or pointer required.");
+    T2 c_tmp;
+    assert(get_size() >= sizeof(T2S));
+    assert(get_size()%sizeof(T2S) == 0);
+    c_tmp.resize(get_size()/sizeof(T2S));
+    memcpy_to_buffer((const char*)c_tmp.data(), c_tmp.size()*sizeof(T2S));
+    return c_tmp;
+    //std::cout << "SET DATA CONTIGUOUS" << std::endl;
+}
+
 /* mmap assignment */
 template<typename T, template<class > class G> template<typename T2>
 T2 * node<T, G>::mmap(void) const {
