@@ -3,8 +3,8 @@
 %% TEST
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 addpath('./../');
-if ~ispc % not windows	
-    filename=[getenv("HOME") + '/bml_test.dat'];
+if ~ispc % not windows
+    filename=[getenv("HOME") , '/bml_test.dat'];
 else % windows
     filename= 'bml_test.dat';
 end
