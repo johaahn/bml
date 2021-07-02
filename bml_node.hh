@@ -1367,9 +1367,7 @@ public:
 	 * Underlying bit pattern of the destination type is filled with
 	 * node resource segment of node.
 	 * @return  copied data of node casted in T2 type.
-	 */
-	template<typename T2> T2 get_data(void) const;
-
+     */
     template<typename T2, typename std::enable_if<is_container<T2>::value && !is_map<T2>::value && !is_contiguous<T2>::value >::type* = nullptr> T2 get_data(void) const;
     template<typename T2, typename std::enable_if<is_container<T2>::value && !is_map<T2>::value && is_contiguous<T2>::value >::type* = nullptr> T2 get_data(void) const;
     template<typename T2, typename std::enable_if<!is_container<T2>::value >::type* = nullptr> T2 get_data(void) const;
