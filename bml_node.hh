@@ -1738,6 +1738,9 @@ bool node<T, G>::is_mmapable(void) const {
 
 template<typename T, template<class > class G> template<typename T2>
 T2 & node<T, G>::map(void) const {
+    if (_s_segment.size() != sizeof(T2)) {
+        std::cout << "_s_segment.size() : " << _s_segment.size() << " ;  sizeof(T2) : " << sizeof(T2) << std::endl;
+    }
 	M_ASSERT(_s_segment.size() == sizeof(T2));
 	T2 * c_tmp = (T2 *) _s_segment.mmap();
 	return *c_tmp;
@@ -2400,7 +2403,7 @@ void node<T, G>::copy_link(node<T, G> const & other) {
 	{
 		const_it pc_it = other._m_childs.begin();
 		while (pc_it != other._m_childs.end()) {
-			add(pc_it->first)->copy_link(*(pc_it->second));
+            add(pc_it->second->get_id())->copy_link(*(pc_it->second));
 			pc_it++;
 		}
 	}
@@ -2424,7 +2427,7 @@ void node<T, G>::copy(node<T, G> const & other) {
 	{
 		const_it pc_it = other._m_childs.begin();
 		while (pc_it != other._m_childs.end()) {
-			add(pc_it->first)->copy(*(pc_it->second));
+            add(pc_it->second->get_id())->copy(*(pc_it->second));
 			pc_it++;
 		}
 	}
