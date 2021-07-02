@@ -1079,6 +1079,12 @@ public:
 	/*! Iterator type of find() result type. */
 	typedef typename std::vector<it>::iterator find_iterator;
 
+    /* equal_range() result type. */
+    typedef typename std::pair<node<T, G>::it,node<T, G>::it> er_it;
+
+    /* equal_range() result type (const). */
+    typedef typename std::pair<node<T, G>::const_it,node<T, G>::const_it> const_er_it;
+
 private:
 	/*! memory init function */
 	void _init(void);
@@ -1202,8 +1208,10 @@ public:
 	 * @return            list of childs found.
 	 *
 	 * Notice that result is an alias of std::vector<it>
-	 */
-	node<T,G>::find_result find(T const & in_i_id);
+     */
+    node<T,G>::find_result find(T const & in_id);
+    node<T,G>::er_it equal_range(T const & in_id);
+    node<T,G>::const_er_it equal_range(T const & in_id) const;
 
 	/*!
 	 * Get all childs of node.
@@ -1212,6 +1220,27 @@ public:
 	 * Notice that result is an alias of std::vector<it>
 	 */
 	node<T,G>::find_result childs(void);
+
+    /*!
+     * Get first child iterator.
+     * @return            begin iterator.
+     */
+    node<T, G>::it begin(void);
+    /*!
+     * Get last child iterator.
+     * @return            end iterator.
+     */
+    node<T, G>::it end(void);
+    /*!
+     * Get first child iterator.
+     * @return            begin const iterator.
+    */
+    node<T, G>::const_it cbegin(void) const;
+    /*!
+     * Get last child iterator.
+     * @return            end const iterator.
+     */
+    node<T, G>::const_it cend(void) const;
 
 	/*!
 	 * Internal event of new resource request.
@@ -1598,6 +1627,18 @@ void node<T, G>::dump() {
 }
 
 template<typename T, template<class > class G>
+typename node<T,G>::er_it node<T,G>::equal_range(T const & in_id) {
+    return _m_childs.equal_range(in_id);
+}
+
+/*
+template<typename T, template<class > class G>
+typename std::pair<node<T,G>::const_it,node<T,G>::const_it> equal_range(T const & in_i_id) const {
+  return _m_childs.equal_range(in_id);
+}
+*/
+
+template<typename T, template<class > class G>
 typename node<T, G>::find_result node<T, G>::find(T const & in_id) {
 	node<T, G>::find_result v_tmp;
 	std::pair<it, it> c_ret = _m_childs.equal_range(in_id);
@@ -1608,6 +1649,18 @@ typename node<T, G>::find_result node<T, G>::find(T const & in_id) {
 
 	return v_tmp;
 }
+
+template<typename T, template<class > class G>
+typename node<T, G>::it node<T,G>::begin() { return _m_childs.begin(); }
+
+template<typename T, template<class > class G>
+typename node<T, G>::it node<T,G>::end() { return _m_childs.end(); }
+
+template<typename T, template<class > class G>
+typename node<T, G>::const_it node<T,G>::cbegin() const { return _m_childs.cbegin(); }
+
+template<typename T, template<class > class G>
+typename node<T, G>::const_it node<T,G>::cend() const { return _m_childs.cend(); }
 
 template<typename T, template<class > class G>
 typename node<T, G>::find_result node<T, G>::childs(void) {
@@ -2809,7 +2862,11 @@ int node_parser<G>::parse_resource(node_resource_segment<G> & out_c_seg,
  */
 template<template<class > class G>
 node_file_parser<G>::node_file_parser(std::string const & in_str_path) :
-		node_parser<G>() {
+        node_parser<G>() {
+
+    if(!in_str_path.size()){
+        return;
+    }
 
 	/* Opening file */
 	_c_is.open(in_str_path.c_str(), std::ios::binary);
@@ -2818,12 +2875,17 @@ node_file_parser<G>::node_file_parser(std::string const & in_str_path) :
 	char ac_tmp[4];
 	_c_is.read(ac_tmp, 4);
 
-	/* check BML word presence */
-	if ((ac_tmp[0] != 'B') || (ac_tmp[1] != 'M') || (ac_tmp[2] != 'L')
-			|| (ac_tmp[3] != 0)) {
-		throw std::runtime_error("Invalid BML format");
-		//TODO return null pointer
-	}
+    /* check BML word presence */
+    if ((ac_tmp[0] != 'B') || (ac_tmp[1] != 'M') || (ac_tmp[2] != 'L')
+        || (ac_tmp[3] != 0)) {
+        for (size_t i = 0; i < 4; i++) {
+            std::cout << "ac_tmp["<<i<<"] =" << ac_tmp[i] << '\n'; fflush(stdout);
+        }
+        std::cout << "PATH :" << in_str_path.c_str() <<'\n';fflush(stdout);
+
+        throw std::runtime_error("Invalid BML format");
+        //TODO return null pointer
+    }
 
 }
 
